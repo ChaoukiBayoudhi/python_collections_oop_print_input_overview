@@ -90,7 +90,14 @@ class Student:
     
     @birthdate.setter
     def birthdate(self, value):
-        self.__birthdate = value
+        # Make sure birthdate is a datetime object
+        if isinstance(value, str):
+            # If birthdate is a string, convert it to datetime
+            self.__birthdate = dt.datetime.strptime(value, '%Y-%m-%d')
+        elif isinstance(value, dt.datetime):
+            self.__birthdate = value
+        else:
+            raise ValueError("birthdate must be a datetime object or a string in 'YYYY-MM-DD' format")
 
     # Getter and Setter for email
     @property
@@ -113,6 +120,32 @@ class Student:
     # Define string representation of the Student object
     def __str__(self) -> str:
         return f'name = {self.__name+" "+self.__familyName}, ID = {self.__studentId}, major = {self.__major}'
+    
+    # Define a method to calculate the student's age in years, months and days
+    def age(self):
+        # Make sure self.__birthdate is a datetime object, not a method
+        if callable(self.__birthdate):
+            current_birthdate = self.__birthdate()
+        else:
+            current_birthdate = self.__birthdate
+
+        # Calculate the difference between the current date and the student's birthdate
+        delta = dt.datetime.now() - current_birthdate
+        # Calculate the age in years, months and days
+        years = delta.days // 365
+        months = (delta.days % 365) // 30
+        days = (delta.days % 365) % 30
+        return years, months, days
+
+    #other version of age function using predefined functions
+    def age2(self):
+        if callable(self.__birthdate):
+            current_birthdate = self.__birthdate()
+        else:
+            current_birthdate = self.__birthdate
+        return divmod((dt.datetime.now() - current_birthdate).days, 365)
+    
+
 
 
 # Creating a student
@@ -125,3 +158,36 @@ print(s1.major)  # Uses the @property getter
 # Setting values using setters
 s1.major = "Data Science"  # Uses the @major.setter
 s1.email = "ahmed@example.com"  # Uses the @email.setter
+
+#Example of using the age method
+print(s1.age())
+print(s1.age2())
+
+#Example of inheritance
+class Teacher(Person):
+    def __init__(self, name, familyName, birthdate, email, address, subject, salary):
+        super().__init__(name, familyName, birthdate, email, address)
+        self.subject = subject
+        self.salary = salary
+
+    def __str__(self):
+        return f'name = {self.name+" "+self.familyName}, email = {self.email}, subject = {self.subject}, salary = {self.salary}'
+        #or using the parent class method
+        #return super().__str__() + f", subject = {self.subject}, salary = {self.salary}"
+    
+    def increase_salary(self, amount):
+        self.salary += amount
+
+# Create a Teacher object using arabic names written in latin characters
+t1 = Teacher(name='Ahmed', 
+                familyName='Ben Mohamed', 
+                birthdate=dt.datetime(1980, 3, 17),
+                email = 'ahmed.benmohamed@isg.tn',
+                address = 'Tunis, Tunisia',
+                subject = 'Computer Science', 
+                salary = 50000
+                )
+# Print the teacher's details
+print(t1)
+t1.increase_salary(5000)
+print(t1)

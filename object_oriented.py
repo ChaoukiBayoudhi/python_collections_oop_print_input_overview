@@ -1,5 +1,6 @@
 # Import datetime library with alias 'dt' for date/time operations
 import datetime as dt
+from abc import ABC, abstractmethod
 
 # Define a class named Person to represent individual people
 class Person:
@@ -191,3 +192,172 @@ t1 = Teacher(name='Ahmed',
 print(t1)
 t1.increase_salary(5000)
 print(t1)
+
+
+#Example of polymorphism, multiple inheritance and method overriding
+# Define a class named MeansOfTransport to represent different types of vehicles
+#include protected fields
+#Design is an abstract class that is inherited by Bicycle and Car
+#MeansOfTransport is an abstract class that is inherited by Bicycle and Car
+#Bicycle and Car are concrete classes
+#use decorators to define abstract methods and properties
+#use super() to call parent class methods
+#use method overriding to change the behavior of inherited methods
+#use polymorphism to call the same method on different objects
+class MeansOfTransport(ABC):
+    """Base class for all transportation vehicles. Defines common properties and behaviors."""
+    def __init__(self, name: str, max_speed: float):
+        # Protected attributes with underscore prefix
+        self._name = name          # Name of the vehicle
+        self._max_speed = max_speed  # Maximum speed in km/h
+
+    def __str__(self) -> str:
+        # String representation of the vehicle
+        return f'{self._name} with max speed of {self._max_speed} km/h'
+
+    # Abstract methods that must be implemented by child classes
+    @abstractmethod
+    def move(self) -> str:
+        """Define how the vehicle moves"""
+        pass
+
+    """
+    #without using decorators
+    def move(self) -> str:
+        '''Method for movement'''
+        raise NotImplementedError("Subclasses must implement this method")
+    """
+    
+    @abstractmethod
+    def stop(self) -> str:
+        """Define how the vehicle stops"""
+        pass
+    
+    @abstractmethod
+    def turn(self, direction: str) -> str:
+        """Define how the vehicle turns"""
+        pass
+
+class Design(ABC):
+    """Handles the appearance and material properties of vehicles"""
+    def __init__(self, color: str, material: str):
+        self._color = color        # Color of the vehicle
+        self._material = material  # Main material used in construction
+
+    def __str__(self) -> str:
+        return f'{self.color} {self.material}'
+
+    # Property decorators for controlled access to attributes
+    @property
+    def color(self) -> str:
+        """Get the color of the vehicle"""
+        return self._color 
+    
+    @color.setter
+    def color(self, value):
+        """Set the color of the vehicle with validation"""
+        if not isinstance(value, str):
+            raise ValueError("Color must be a string")
+        self._color = value
+    
+    @property
+    def material(self) -> str:
+        """Get the material of the vehicle"""
+        return self._material
+    
+    @material.setter
+    def material(self, value):
+        """Set the material of the vehicle with validation"""
+        if not isinstance(value, str):
+            raise ValueError("Material must be a string")
+        self._material = value
+
+class Bicycle(MeansOfTransport, Design):
+    """Represents a bicycle - inherits from both MeansOfTransport and Design"""
+    def __init__(self, name: str, max_speed: float, color: str, material: str):
+        # Initialize both parent classes
+        MeansOfTransport.__init__(self, name, max_speed)
+        Design.__init__(self, color, material)
+    
+    # Implementation of required abstract methods
+    def move(self) -> str:
+        """Describes how a bicycle moves"""
+        return 'Pedal to move the bicycle'
+    
+    def stop(self) -> str:
+        """Describes how a bicycle stops"""
+        return 'Apply the brakes to stop the bicycle'
+    
+    def turn(self, direction: str) -> str:
+        """Describes how a bicycle turns"""
+        return f'Turn the handlebars {direction} to turn the bicycle'
+
+    def __str__(self) -> str:
+        """Combined string representation of transport and design properties"""
+        return f'{super().__str__()} with {Design.__str__(self)}'
+
+class Car(MeansOfTransport, Design):
+    """Represents a car with additional car-specific properties"""
+    def __init__(self, 
+                 name: str, 
+                 max_speed: float, 
+                 color: str, 
+                 material: str, 
+                 wheels: int = 4,           # Number of wheels
+                 doors: int = 4,            # Number of doors
+                 seats: int = 5,            # Number of seats
+                 engine: str = 'V6',        # Engine type
+                 fuel: str = 'Gasoline',    # Fuel type
+                 transmission: str = 'Automatic'):  # Transmission type
+        # Initialize parent classes
+        MeansOfTransport.__init__(self, name, max_speed)
+        Design.__init__(self, color, material)
+        
+        # Car-specific attributes
+        self.wheels = wheels
+        self.doors = doors
+        self.seats = seats
+        self.engine = engine
+        self.fuel = fuel
+        self.transmission = transmission
+    
+    # Implementation of required abstract methods
+    def move(self) -> str:
+        """Describes how a car moves"""
+        return 'Press the accelerator to move the car'
+    
+    def stop(self) -> str:
+        """Describes how a car stops"""
+        return 'Press the brake pedal to stop the car'
+    
+    def turn(self, direction: str) -> str:
+        """Describes how a car turns"""
+        return f'Turn the steering wheel {direction} to turn the car'
+    
+    def __str__(self) -> str:
+        """Combined string representation of transport and design properties"""
+        return f'{super().__str__()} with {Design.__str__(self)}'
+
+# Example usage of the classes
+if __name__ == "__main__":
+    # Create a bicycle instance
+    bike = Bicycle(
+        name="Mountain Bike",
+        max_speed=30,
+        color="red",
+        material="aluminum"
+    )
+    print(bike)                    # Display bicycle details
+    print(bike.move())            # Show how bicycle moves
+    print(bike.turn("left"))      # Show how bicycle turns
+    
+    # Create a car instance
+    car = Car(
+        name="Sedan",
+        max_speed=200,
+        color="blue",
+        material="steel"
+    )
+    print(car)                    # Display car details
+    print(car.move())            # Show how car moves
+    print(car.turn("right"))     # Show how car turns
